@@ -2,34 +2,84 @@ package co.com.puj.aes.proveedor.controller;
 
 import co.com.puj.aes.proveedor.entity.Proveedor;
 import co.com.puj.aes.proveedor.repository.ProveedorRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-
+@RequiredArgsConstructor
+@RequestMapping (value = "/proveedor")
+@CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT,
+        RequestMethod.DELETE}, allowedHeaders = "*")
 public class ProveedorController {
-
+    @Autowired
     private ProveedorRepository proveedorRepository;
 
-    @PostMapping("/proveedor")
+    @PostMapping("")
+    public ResponseEntity<?> create(@RequestBody Proveedor proveedor) throws Exception {
+        return new ResponseEntity<>(proveedorRepository.save(proveedor), HttpStatus.OK);
+    }
+
+
+    @ResponseBody
+    @GetMapping("{id}")
+    public ResponseEntity <?> getByid(@PathVariable("id") String id ) throws Exception {
+        Proveedor proveedor = proveedorRepository.getProveedorById(id);
+        if(proveedor==null){
+            return new ResponseEntity<>("No existen resultados para su consulta",HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(proveedorRepository.getProveedorById(id),HttpStatus.OK);
+    }
+
+
+
+    @PutMapping("{id}")
+    public ResponseEntity <?> update(@PathVariable("id") String idProveedor, @RequestBody Proveedor proveedor) throws Exception {
+        Proveedor proveedor1 = proveedorRepository.getProveedorById(idProveedor);
+        if(proveedor1==null){
+            return new ResponseEntity<>("No existe un Proveedor correspondiente al id ingresado",HttpStatus.BAD_REQUEST);
+        }
+        proveedor.setIdProveedor(idProveedor);
+        return new ResponseEntity<>(proveedorRepository.update(idProveedor, proveedor),HttpStatus.OK);
+    }
+
+  /*  @DeleteMapping("/proveedor/{id}")
+    public String deleteProveedor(@PathVariable("id")String idProvedor){
+        return proveedorRepository.delete(idProvedor);
+    }*/
+
+    @ResponseBody
+    @DeleteMapping("{idProveedor}")
+    public ResponseEntity <?> delete(@PathVariable("idProveedor") String idProveedor) throws Exception {
+        Proveedor proveedor = proveedorRepository.getProveedorById(idProveedor);
+        if(proveedor==null /*|| !proveedorService.existeById(id)*/){
+            return new ResponseEntity<>("No existe un Eps correspondiente al id ingresado",HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(proveedorRepository.delete(idProveedor), HttpStatus.OK);
+    }
+
+
+    /*@PostMapping("/proveedor")
     public Proveedor saveProveedor(@RequestBody Proveedor proveedor) {
         System.out.println("proveedor = " + proveedor.getContacto());
         return proveedorRepository.save(proveedor);
     }
-    @GetMapping("/proveedor{id}")
+    @GetMapping("/proveedor/{id}")
     public Proveedor getProveedor(@PathVariable("id") String idProveedor){
         return proveedorRepository.getProveedorById(idProveedor);
     }
 
-    @DeleteMapping("/proveedor{id}")
-    public String deleteProveedor(@PathVariable("id")String idProvedor){
-        return proveedorRepository.delete(idProvedor);
-    }
-
-    @PutMapping("/proveedor{id}")
+     @PutMapping("/proveedor/{id}")
     public String updateProveedor(@PathVariable("id")String idProveedor,@RequestBody Proveedor proveedor){
         return proveedorRepository.update(idProveedor, proveedor);
     }
+
+
+
+    */
 
     /*@GetMapping("")
     public ResponseEntity<?> getList() throws Exception {
@@ -64,35 +114,9 @@ public class ProveedorController {
         return new ResponseEntity<>(proveedorService.create(proveedor), HttpStatus.OK);
     }
 
-    @PutMapping("{id}")
-    public ResponseEntity <?> update(@PathVariable("id") Short id, @RequestBody Proveedor proveedor) throws Exception {
-        Proveedor proveedor1 = proveedorService.findById(id);
-        if(proveedor1==null){
-            return new ResponseEntity<>("No existe un Eps correspondiente al id ingresado",HttpStatus.BAD_REQUEST);
-        }
-        proveedor.setIdEps(id);
-        return new ResponseEntity<>(proveedorService.update(proveedor),HttpStatus.OK);
-    }
 
-    @ResponseBody
-    @DeleteMapping("{id}")
-    public ResponseEntity <?> delete(@PathVariable("id") Short id) throws Exception {
-        Proveedor proveedor1 = proveedorService.findById(id);
-        if(proveedor1==null || !proveedorService.existeById(id)){
-            return new ResponseEntity<>("No existe un Eps correspondiente al id ingresado",HttpStatus.BAD_REQUEST);
-        }
 
-        return new ResponseEntity<>(proveedorService.deleteEPS(id), HttpStatus.OK);
-    }
-    @Deprecated
-    @PutMapping("/activar/{id}")
-    public ResponseEntity <?> activar(@PathVariable("id") Short id) throws Exception {
-        Proveedor proveedor = proveedorService.findId(id);
-        if(proveedor==null || !proveedorService.existeById(id)){
-            return new ResponseEntity<>("No existe un Eps correspondiente al id ingresado",HttpStatus.BAD_REQUEST);
-        }
 
-        return new ResponseEntity<>(proveedorService.activar(id), HttpStatus.OK);
     }*/
 
 }
