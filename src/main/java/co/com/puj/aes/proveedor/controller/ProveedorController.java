@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -23,6 +24,9 @@ public class ProveedorController {
         return new ResponseEntity<>(proveedorRepository.save(proveedor), HttpStatus.OK);
     }
 
+@Autowired
+private KafkaTemplate<String, Proveedor> kafkaTemplate;
+    private static final String TOPIC = "reserva";
 
     @ResponseBody
     @GetMapping("{id}")
@@ -31,6 +35,7 @@ public class ProveedorController {
         if(proveedor==null){
             return new ResponseEntity<>("No existen resultados para su consulta",HttpStatus.BAD_REQUEST);
         }
+        kafkaTemplate.send(TOPIC, proveedor);
         return new ResponseEntity<>(proveedorRepository.getProveedorById(id),HttpStatus.OK);
     }
 
