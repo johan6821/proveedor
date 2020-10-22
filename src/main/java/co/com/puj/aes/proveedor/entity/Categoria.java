@@ -16,7 +16,7 @@ public class Categoria {
     @DynamoDBAttribute
     private String categorianame;
     @DynamoDBAttribute
-    private String categoriacode;
+    private String subcategoria;
 
 
 

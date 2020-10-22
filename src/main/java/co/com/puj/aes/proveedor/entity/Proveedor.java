@@ -14,9 +14,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
-
-import java.io.Serializable;
 
 /**
  * @author Johan Céspedes at PUJ
@@ -44,6 +41,8 @@ public class Proveedor {
     @DynamoDBAttribute
     private String contacto;
     @DynamoDBAttribute
+    private String calificacion;
+    @DynamoDBAttribute
     private boolean estado;
     @DynamoDBAttribute
     private String descripcion;
@@ -53,12 +52,4 @@ public class Proveedor {
     public Proveedor(String idProveedor) {
         this.idProveedor = idProveedor;
     }
-
-
-/*    Artículos
-    Cantidad
-    Precio
-    IVA
-    Estado de pago
-    Cantidad a pagar*/
 }

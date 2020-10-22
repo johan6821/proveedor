@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 @Repository
 public class ProveedorRepository {
@@ -24,14 +26,14 @@ public class ProveedorRepository {
         return dynamoDbMapper.load(Proveedor.class, idProveedor);
     }
 
-    public  String update (String idProveedor, Proveedor proveedor){
+    public  Proveedor update (String idProveedor, Proveedor proveedor){
         dynamoDbMapper.save(proveedor,
                 new DynamoDBSaveExpression()
                         .withExpectedEntry("idProveedor",
                                 new ExpectedAttributeValue(
                                         new AttributeValue().withS(idProveedor)
                                 )));
-        return idProveedor;
+        return dynamoDbMapper.load(Proveedor.class, idProveedor);
 
     }
 
