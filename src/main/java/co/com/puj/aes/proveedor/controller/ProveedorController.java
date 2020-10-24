@@ -1,7 +1,7 @@
 package co.com.puj.aes.proveedor.controller;
 
 import co.com.puj.aes.proveedor.entity.Proveedor;
-import co.com.puj.aes.proveedor.repository.ProveedorRepository;
+import co.com.puj.aes.proveedor.service.ProveedorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,7 +10,6 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.parser.Entity;
 import java.util.List;
 
 
@@ -21,37 +20,44 @@ import java.util.List;
         RequestMethod.DELETE}, allowedHeaders = "*")
 public class ProveedorController {
     @Autowired
-    private ProveedorRepository proveedorRepository;
+    private ProveedorService proveedorService;
+
+    public ProveedorController(ProveedorService proveedorService){this.proveedorService = proveedorService;}
+
     @Autowired
     private KafkaTemplate<String, Proveedor> kafkaTemplate;
     private static final String TOPIC = "reserva";
 
-    /*@GetMapping("")
+    @GetMapping("")
     public ResponseEntity<?> getList() throws Exception {
-        List<Proveedor> list = proveedorRepository.getProveedorList();
+        List<Proveedor> list = proveedorService.findAll();
         if(!list.isEmpty()){
             return new ResponseEntity<List>(list, HttpStatus.OK);
         }
         return new ResponseEntity<>("No hay registros",HttpStatus.NOT_FOUND);
-    }*/
+    }
 
     @PostMapping("")
     public ResponseEntity<?> create(@RequestBody Proveedor proveedor) throws Exception {
-        return new ResponseEntity<>(proveedorRepository.save(proveedor), HttpStatus.OK);
+        return new ResponseEntity<>(proveedorService.save(proveedor), HttpStatus.OK);
     }
     @ResponseBody
     @GetMapping("{id}")
     public ResponseEntity <?> getByid(@PathVariable("id") String id ) throws Exception {
-        Proveedor proveedor = proveedorRepository.getProveedorById(id);
+        Proveedor proveedor = proveedorService.getProveedorById(id);
         if(proveedor==null){
             return new ResponseEntity<>("No existen resultados para su consulta",HttpStatus.BAD_REQUEST);
         }
         kafkaTemplate.send(TOPIC, proveedor);
-        return new ResponseEntity<>(proveedorRepository.getProveedorById(id),HttpStatus.OK);
+        return new ResponseEntity<>(proveedorService.getProveedorById(id),HttpStatus.OK);
     }
-@KafkaListener(topics = "reserva", groupId = "JohanCespedes")
+    @KafkaListener(topics = "reserva", groupId = "proveedor")
+    public String consumerProveedor (String proveedor){
+        return proveedor;
+    }
+
     public ResponseEntity <?> updateCalificaicion(@RequestBody Proveedor calificacion) throws Exception {
-    Proveedor proveedor1 = proveedorRepository.getProveedorById(calificacion.getIdProveedor());
+    Proveedor proveedor1 = proveedorService.getProveedorById(calificacion.getIdProveedor());
     if(proveedor1==null){
         return new ResponseEntity<>("No existe un Proveedor correspondiente al id ingresado",HttpStatus.BAD_REQUEST);
     }
@@ -61,29 +67,23 @@ public class ProveedorController {
 }
     @PutMapping("{id}")
     public ResponseEntity <?> update(@PathVariable("id") String idProveedor, @RequestBody Proveedor proveedor) throws Exception {
-        Proveedor proveedor1 = proveedorRepository.getProveedorById(idProveedor);
+        Proveedor proveedor1 = proveedorService.getProveedorById(idProveedor);
         if(proveedor1==null){
             return new ResponseEntity<>("No existe un Proveedor correspondiente al id ingresado",HttpStatus.BAD_REQUEST);
         }
         proveedor.setIdProveedor(idProveedor);
-        return new ResponseEntity<>(proveedorRepository.update(idProveedor, proveedor),HttpStatus.OK);
+        return new ResponseEntity<>(proveedorService.update(idProveedor, proveedor),HttpStatus.OK);
     }
-
-  /*  @DeleteMapping("/proveedor/{id}")
-    public String deleteProveedor(@PathVariable("id")String idProvedor){
-        return proveedorRepository.delete(idProvedor);
-    }*/
 
     @ResponseBody
     @DeleteMapping("{idProveedor}")
     public ResponseEntity <?> delete(@PathVariable("idProveedor") String idProveedor) throws Exception {
-        Proveedor proveedor = proveedorRepository.getProveedorById(idProveedor);
+        Proveedor proveedor = proveedorService.getProveedorById(idProveedor);
         if(proveedor==null /*|| !proveedorService.existeById(id)*/){
             return new ResponseEntity<>("No existe un Eps correspondiente al id ingresado",HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(proveedorRepository.delete(idProveedor), HttpStatus.OK);
+        return new ResponseEntity<>(proveedorService.deleteProveedor(idProveedor), HttpStatus.OK);
     }
-
 
     /*@PostMapping("/proveedor")
     public Proveedor saveProveedor(@RequestBody Proveedor proveedor) {
@@ -99,8 +99,6 @@ public class ProveedorController {
     public String updateProveedor(@PathVariable("id")String idProveedor,@RequestBody Proveedor proveedor){
         return proveedorRepository.update(idProveedor, proveedor);
     }
-
-
 
     */
 
@@ -129,9 +127,6 @@ public class ProveedorController {
     public ResponseEntity <?> create(@RequestBody Proveedor proveedor) throws Exception {
         return new ResponseEntity<>(proveedorService.create(proveedor), HttpStatus.OK);
     }
-
-
-
 
     }*/
 
